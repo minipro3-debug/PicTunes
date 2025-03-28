@@ -34,13 +34,13 @@ def is_logged_in():
 processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base",use_fast=True)
 model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
 
-SPOTIFY_CLIENT_ID = "8e267334234f406f9a73e30d976398a3"
-SPOTIFY_CLIENT_SECRET = "4da6203141c74520a170702d7cd6a2ad"
+SPOTIFY_CLIENT_ID = "spotify_client_id"
+SPOTIFY_CLIENT_SECRET = "spotify_client_secret"
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
     client_id=SPOTIFY_CLIENT_ID, client_secret=SPOTIFY_CLIENT_SECRET
 ))
 
-MISTRAL_API_KEY = "r9DzjYYPDjBVsIZvD5dWBUAAghEVjLmq"
+MISTRAL_API_KEY = "mistral_api"
 
 # Add these imports at the top
 import logging
