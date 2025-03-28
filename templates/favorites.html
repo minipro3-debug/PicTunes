@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorite Songs - PicTunes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff4b4b;
+            --secondary-color: #1DB954;
+            --background-gradient: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--background-gradient);
+        }
+
+        .favorites-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            transition: 0.3s;
+            border-radius: 5px;
+        }
+
+        .nav-links a:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .favorites-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .song-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .song-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .song-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .song-info {
+            text-align: center;
+        }
+
+        .song-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0.5rem 0;
+        }
+
+        .artist-name {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .song-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .spotify-btn, .remove-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .spotify-btn {
+            background: white;
+            color: #1DB954;
+            border-color: #1DB954;
+        }
+
+        .spotify-btn:hover {
+            background: rgba(255, 255, 255, 0.952);
+        }
+
+        .remove-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .remove-btn:hover {
+            background: #ff6b6b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .favorites-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="favorites-container">
+        <nav class="navbar">
+            <div class="logo">PicTunes 🎵</div>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </nav>
+
+        <div class="favorites-header">
+            <h1>Your Favorite Songs</h1>
+            <p>Your personalized music collection</p>
+        </div>
+
+        {% if songs %}
+        <div class="favorites-grid">
+            {% for song in songs %}
+            <div class="song-card" data-song-id="{{ song.id }}">
+                <img src="{{ song.cover_url }}" alt="Album Cover" class="song-image">
+                <div class="song-info">
+                    <h3 class="song-title">{{ song.song_name }}</h3>
+                    <p class="artist-name">{{ song.artist_name }}</p>
+                    <div class="song-actions">
+                        <a href="{{ song.spotify_url }}" target="_blank" class="spotify-btn">
+                            <i class="fab fa-spotify"></i> Listen on Spotify
+                        </a>
+                        <button onclick="removeFavorite('{{ song.id }}')" class="remove-btn">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-music" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <h2>No favorite songs yet</h2>
+            <p>Start adding some songs from your dashboard!</p>
+            <a href="{{ url_for('dashboard') }}" class="btn-primary" style="margin-top: 1rem;">Go to Dashboard</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+<script>
+async function removeFavorite(songId) {
+    if (confirm('Are you sure you want to remove this song from favorites?')) {
+        try {
+            const response = await fetch(`/remove_favorite/${songId}`, {
+                method: 'POST',
+                credentials: 'same-origin'
+            });
+            if (response.ok) {
+                document.querySelector(`[data-song-id="${songId}"]`).remove();
+                if (document.querySelectorAll('.song-card').length === 0) {
+                    location.reload();
+                }
+            } else {
+                alert('Failed to remove song');
+            }
+        } catch (error) {
+            alert('Error removing song: ' + error.message);
+        }
+    }
+}
+</script>
+</html>

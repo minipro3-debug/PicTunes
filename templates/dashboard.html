@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - PicTunes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .dashboard-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .upload-section {
+            text-align: center;
+            padding: 2rem;
+            border: 2px dashed #ff6b6b;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+        }
+
+        .upload-section:hover {
+            border-color: var(--primary-color);
+        }
+
+        .style-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .style-option {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .style-option:hover {
+            border-color: var(--primary-color);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .results-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .caption-box {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .song-recommendation {
+            transition: transform 0.3s;
+        }
+
+        .song-recommendation:hover {
+            transform: translateX(5px);
+        }
+
+        #loading {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="navbar">
+            <div class="logo">PicTunes 🎵</div>
+            <div class="nav-links">
+                <a href="{{ url_for('favorites') }}" class="btn-primary">Favorites</a>
+                <a href="{{ url_for('logout') }}" class="btn-primary">Logout</a>
+            </div>
+        </nav>
+
+        <div class="content-card">
+            <h2>Upload Image</h2>
+            <form id="uploadForm" class="mb-4">
+                <div class="upload-section">
+                    <input type="file" class="form-control" id="imageInput" accept="image/*" required>
+                    <div id="imagePreview" class="mt-3"></div>
+                </div>
+                
+                <div class="style-options">
+                    <div class="form-group">
+                        <label>Caption Style:</label>
+                        <select class="form-control" id="styleSelect">
+                            <option value="Normal">Normal</option>
+                            <option value="Funny">Funny</option>
+                            <option value="Inspirational">Inspirational</option>
+                            <option value="Romantic">Romantic</option>
+                            <option value="Happy">Happy</option>
+                            <option value="Sad">Sad</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Language:</label>
+                        <select class="form-control" id="languageSelect">
+                            <option value="English">English</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Telugu">Telugu</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary">Generate</button>
+            </form>
+
+            <div id="loading">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Processing your image...</p>
+            </div>
+
+            <div id="results" class="results-section">
+                <div>
+                    <h3>Generated Caption</h3>
+                    <div id="captionOutput" class="caption-box"></div>
+                </div>
+                
+                <div>
+                    <h3>Song Recommendations</h3>
+                    <div id="recommendationsOutput"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('image', document.getElementById('imageInput').files[0]);
+            formData.append('style', document.getElementById('styleSelect').value);
+            formData.append('language', document.getElementById('languageSelect').value);
+            
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            
+            try {
+                const response = await fetch('/process_image', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'  // Add this line
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                document.getElementById('captionOutput').textContent = data.caption;
+                document.getElementById('recommendationsOutput').innerHTML = data.recommendations;
+                
+            } catch (error) {
+                alert('Error processing image: ' + error.message);
+                console.error('Error:', error);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('results').style.display = 'block';
+            }
+        });
+
+        // Image preview
+        document.getElementById('imageInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'preview-image';
+                    const preview = document.getElementById('imagePreview');
+                    preview.innerHTML = '';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+
+    <script>
+        // Add this after your existing JavaScript
+        async function saveSong(songData) {
+            try {
+                const response = await fetch('/save_song', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(songData)
+                });
+                
+                const data = await response.json();
+                alert(data.message);
+            } catch (error) {
+                alert('Error saving song: ' + error.message);
+            }
+        }
+    </script>
+
+    <style>
+        .save-song-btn {
+            background: transparent;
+            border: 1px solid #ff4b4b;
+            color: #ff4b4b;
+            padding: 5px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .save-song-btn:hover {
+            background: #ff4b4b;
+            color: white;
+        }
+    </style>
+</body>
+</html>

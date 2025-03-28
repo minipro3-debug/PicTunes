@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to PicTunes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .welcome-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature {
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .feature h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .floating-element {
+            position: absolute;
+            opacity: 0.6;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <div class="floating-elements">
+            <i class="fas fa-music floating-element" style="top: 20%; left: 15%;"></i>
+            <i class="fas fa-camera floating-element" style="top: 30%; right: 20%;"></i>
+            <i class="fas fa-heart floating-element" style="bottom: 25%; left: 25%;"></i>
+            <i class="fas fa-star floating-element" style="top: 15%; right: 35%;"></i>
+            <i class="fas fa-image floating-element" style="bottom: 20%; right: 25%;"></i>
+        </div>
+
+        <div class="welcome-card">
+            <h1 class="welcome-title">Welcome to PicTunes 🎵</h1>
+            <p class="welcome-subtitle">Transform your images into musical experiences with AI-powered captions and personalized song recommendations.</p>
+
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-camera"></i>
+                    <h3>Image Upload</h3>
+                    <p>Upload any image and get AI-generated captions</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-music"></i>
+                    <h3>Song Match</h3>
+                    <p>Get personalized song recommendations</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-language"></i>
+                    <h3>Multi-Language</h3>
+                    <p>Generate captions in multiple languages</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-brain"></i>
+                    <h3>AI-Powered</h3>
+                    <p>Advanced AI models for accurate image analysis and creative captions</p>
+                </div>
+            </div>
+
+            <div class="cta-buttons">
+                <a href="{{ url_for('login') }}" class="btn-primary">Login</a>
+                <a href="{{ url_for('signup') }}" class="btn-primary">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.floating-element').forEach(element => {
+            element.style.animation = `float ${3 + Math.random() * 2}s ease-in-out infinite`;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - PicTunes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="floating-elements">
+            <i class="fas fa-heart floating-element heart" style="top: 20%; left: 20%;"></i>
+            <i class="fas fa-star floating-element star" style="top: 30%; right: 25%;"></i>
+            <i class="fas fa-envelope floating-element envelope" style="bottom: 30%; left: 25%;"></i>
+            <!-- Add more floating elements as needed -->
+        </div>
+        
+        <div class="auth-card">
+            <h2>Login</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST">
+                <div class="form-group">
+                    <input type="text" name="username" class="form-control" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+            
+            <div class="auth-links">
+                <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add floating animation to elements
+        document.querySelectorAll('.floating-element').forEach(element => {
+            element.style.animation = `float ${3 + Math.random() * 2}s ease-in-out infinite`;
+        });
+    </script>
+</body>
+</html>
